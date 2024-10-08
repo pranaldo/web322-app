@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "category": 1,
+        "postDate": "2023-05-14",
+        "featureImage": "https://dummyimage.com/200x200/000/fff",
+        "price": 9.99,
+        "title": "Lawnmower",
+        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras convallis fringilla sem efficitur congue.",
+        "published": true
+    },
+    {
+        "id": 2,
+        "category": 1,
+        "postDate": "2023-05-15",
+        "featureImage": "https://dummyimage.com/200x200/000/fff",
+        "price": 19.99,
+        "title": "Weber BBQ",
+        "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras convallis fringilla sem efficitur congue.",
+        "published": true
+    }
+]

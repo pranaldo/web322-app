@@ -1,0 +1,16 @@
+{
+  "name": "web322-app",
+  "version": "1.0.0",
+  "description": "eCommerce web app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Prasanna Lamichhane",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "keywords": [],
+  "devDependencies": {}
+}
