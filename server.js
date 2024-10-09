@@ -1,13 +1,13 @@
 /*********************************************************************************
 
-WEB322 – Assignment 02
+WEB322 – Assignment 002
 I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 
 Name: Prasanna Lamichhane
 Student ID: 120887237
 Date: 2024-10-07
-Cyclic Web App URL: _______________________________________________________
-GitHub Repository URL: ______________________________________________________
+Glitch Web App URL: https://relieved-impartial-wildflower.glitch.me
+GitHub Repository URL: https://github.com/pranaldo/web322-app
 
 ********************************************************************************/ 
 
