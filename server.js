@@ -6,8 +6,8 @@ I declare that this assignment is my own work in accordance with Seneca  Academi
 Name: Prasanna Lamichhane
 Student ID: 120887237
 Date: 2024-10-07
-Cyclic Web App URL: _______________________________________________________
-GitHub Repository URL: ______________________________________________________
+Glitch Web App URL: https://relieved-impartial-wildflower.glitch.me
+GitHub Repository URL: https://github.com/pranaldo/web322-app
 
 ********************************************************************************/ 
 
