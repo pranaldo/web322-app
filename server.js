@@ -1,67 +1,168 @@
 /*********************************************************************************
 
-WEB322 – Assignment 02
+WEB322 – Assignment 03
 I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 
 Name: Prasanna Lamichhane
 Student ID: 120887237
-Date: 2024-10-07
+Date: 2024-11-01
 Glitch Web App URL: https://simplistic-modern-windflower.glitch.me
 GitHub Repository URL: https://github.com/pranaldo/web322-app
 
 ********************************************************************************/ 
 
-const express = require('express');
-const path = require('path');
-const storeService = require('./store-service'); // Requiring the custom store-service module
+const express = require("express");
+const path = require("path");
+const storeService = require("./store-service");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
 
 const app = express();
+const port = process.env.PORT || 8080;
 
+// Cloudinary configuration
+cloudinary.config({
+    cloud_name: "dmjleswkt",
+    api_key: "629677723193365",
+    api_secret: "cq5nFuI2pT4tLkCt59ReEc8tJI0",
+    secure: true
+});
+
+// Middleware to serve static files
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-    res.redirect('/about');
+// Parse incoming JSON data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Define routes
+app.get('/items/add', (req, res) => {
+    res.sendFile(path.join(__dirname, '/views/addItem.html'));
 });
 
-
-app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'about.html'));
+app.get("/", (req, res) => {
+    res.redirect("/about");
 });
 
+app.get("/about", (req, res) => {
+    res.sendFile(path.join(__dirname, "/views/about.html"));
+});
 
-app.get('/shop', (req, res) => {
+app.get("/shop", (req, res) => {
     storeService.getPublishedItems()
-        .then(publishedItems => res.json(publishedItems))
-        .catch(err => res.status(500).json({ message: err }));
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            res.json({ message: err });
+        });
 });
 
-// Route to retrieve all items using store-service
-app.get('/items', (req, res) => {
-    storeService.getAllItems()
-        .then(items => res.json(items))
-        .catch(err => res.status(500).json({ message: err }));
+app.get("/items", (req, res) => {
+    const { category, minDate } = req.query;
+
+    if (category) {
+        
+        storeService.getItemsByCategory(parseInt(category))
+            .then((data) => res.json(data))
+            .catch((err) => res.status(404).json({ message: err }));
+    } else if (minDate) {
+       
+        storeService.getItemsByMinDate(minDate)
+            .then((data) => res.json(data))
+            .catch((err) => res.status(404).json({ message: err }));
+    } else {
+        
+        storeService.getAllItems()
+            .then((data) => res.json(data))
+            .catch((err) => res.status(404).json({ message: err }));
+    }
 });
 
-// Route to retrieve categories using store-service
-app.get('/categories', (req, res) => {
+app.get("/categories", (req, res) => {
     storeService.getCategories()
-        .then(categories => res.json(categories))
-        .catch(err => res.status(500).json({ message: err }));
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            res.json({ message: err });
+        });
 });
 
-// Handling non-matching routes (404)
+// Initialize multer without disk storage
+const upload = multer();
+
+app.post('/items/add', upload.single('featureImage'), (req, res) => {
+    if (req.file) {
+        let streamUpload = (req) => {
+            return new Promise((resolve, reject) => {
+                let stream = cloudinary.uploader.upload_stream(
+                    (error, result) => {
+                        if (result) {
+                            resolve(result);
+                        } else {
+                            reject(error);
+                        }
+                    }
+                );
+                streamifier.createReadStream(req.file.buffer).pipe(stream);
+            });
+        };
+
+        async function upload(req) {
+            let result = await streamUpload(req);
+            console.log(result);
+            return result;
+        }
+
+        upload(req).then((uploaded) => {
+            processItem(uploaded.url);
+        }).catch((error) => {
+            console.error("Error uploading image:", error);
+            res.redirect('/items'); // Handle error by redirecting
+        });
+    } else {
+        processItem("");
+    }
+
+    function processItem(imageUrl) {
+        req.body.featureImage = imageUrl;
+
+        // Use addItem to save the item data
+        storeService.addItem(req.body).then((newItem) => {
+            res.redirect('/items'); // Redirect after adding the item
+        }).catch((err) => {
+            console.error("Error adding item:", err);
+            res.redirect('/items');
+        });
+    }
+});
+
+// 404 route - This should be the last route
 app.use((req, res) => {
     res.status(404).send("Page Not Found");
 });
 
-// Initialize the store-service and start the server only after successful initialization
+// Initialize the store service and start the server
 storeService.initialize()
     .then(() => {
-        const PORT = process.env.PORT || 8080;
-        app.listen(PORT, () => {
-            console.log(`Express http server listening on port ${PORT}`);
+        app.listen(port, () => {
+            console.log(`Express http server listening on ${port}`);
+
         });
     })
     .catch((err) => {
-        console.error("Failed to initialize the data:", err);
+        console.error(`Failed to initialize store service: ${err}`);
+
     });
+    app.get("/item/:value", (req, res) => {
+        const id = req.params.value;
+        storeService.getItemById(id)
+            .then((item) => {
+                res.json(item);
+            })
+            .catch((err) => {
+                res.status(404).json({ message: err });
+            });
+    });
